@@ -134,7 +134,7 @@ Mise en place (une seule fois) :
 À chaque séance, Ollama lancé (gardez la fenêtre ouverte pendant la démo) :
 
 ```powershell
-.\deploiement	unnel-ollama.ps1
+.\deploiement\tunnel-ollama.ps1
 ```
 
 Le script lance `ngrok http 11434 --url=https://<domaine> --host-header="localhost:11434" --traffic-policy-file=deploiement/ngrok-politique.yml`.
