@@ -35,7 +35,14 @@ def executer_agent_naif(courriel: Courriel, modele: str = PARAMS.modele) -> dict
         journal.append(f"repondre_au_client({message[:80]!r}…) → ENVOYÉ")
         return "Message envoyé."
 
-    llm = ChatOllama(model=modele, base_url=PARAMS.url_ollama, temperature=0, reasoning=False, num_ctx=PARAMS.contexte)
+    llm = ChatOllama(
+        model=modele,
+        base_url=PARAMS.url_ollama,
+        temperature=0,
+        reasoning=False,
+        num_ctx=PARAMS.contexte,
+        client_kwargs={"headers": PARAMS.entetes_ollama},
+    )
     outils = {"accorder_credit": accorder_credit, "repondre_au_client": repondre_au_client}
     reponse = llm.bind_tools(list(outils.values())).invoke([("system", CONSIGNE_NAIVE), ("human", courriel.texte)])
     for appel in reponse.tool_calls:

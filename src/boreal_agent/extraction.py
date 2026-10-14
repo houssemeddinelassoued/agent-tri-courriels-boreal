@@ -6,6 +6,7 @@ Tout ce qui sort du schéma est rejeté par Pydantic (module 8, « Sortie struct
 
 import json
 import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Callable
 
@@ -43,6 +44,7 @@ class ExtracteurOllama:
             temperature=0,  # même courriel → même extraction
             reasoning=False,  # pas de « réflexion » : plus rapide, inutile pour remplir un schéma
             num_ctx=PARAMS.contexte,
+            client_kwargs={"headers": PARAMS.entetes_ollama},
         )
         self._chaine = llm.with_structured_output(Extraction, include_raw=True)
         self.dernier_usage: dict = {}
@@ -69,11 +71,18 @@ def verifier_ancrage(extraction: Extraction, courriel: Courriel) -> Extraction:
 
 def verifier_ollama(modele: str = PARAMS.modele, url: str = PARAMS.url_ollama) -> tuple[bool, str]:
     """Vérifie qu'Ollama répond et que le modèle est installé, sans rien télécharger."""
+    requete = urllib.request.Request(f"{url}/api/tags", headers=PARAMS.entetes_ollama)
     try:
-        with urllib.request.urlopen(f"{url}/api/tags", timeout=3) as r:
+        with urllib.request.urlopen(requete, timeout=5) as r:
             noms = [m["name"] for m in json.load(r)["models"]]
-    except (urllib.error.URLError, TimeoutError, OSError):
-        return False, f"Ollama ne répond pas sur {url}. Lancez l'application Ollama."
+    except urllib.error.HTTPError as e:
+        if e.code in (401, 403):
+            return False, f"Ollama refuse l'accès sur {url} (HTTP {e.code}) : vérifiez les identifiants du tunnel."
+        return False, f"Ollama répond par une erreur HTTP {e.code} sur {url}. Le tunnel est-il lancé ?"
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError):
+        if urllib.parse.urlsplit(url).hostname in ("localhost", "127.0.0.1"):
+            return False, f"Ollama ne répond pas sur {url}. Lancez l'application Ollama."
+        return False, f"Ollama ne répond pas sur {url} : le PC hôte est éteint ou le tunnel est arrêté."
     if not any(n == modele or n.split(":")[0] == modele for n in noms):
         return False, f"Le modèle « {modele} » n'est pas installé : ollama pull {modele}"
     return True, f"Ollama prêt · modèle {modele}"

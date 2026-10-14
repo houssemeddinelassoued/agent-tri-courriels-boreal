@@ -14,3 +14,6 @@ wheels/
 traces/
 rapports/
 .pytest_cache/
+
+# Identifiants du tunnel ngrok (version web)
+deploiement/ngrok-politique.yml

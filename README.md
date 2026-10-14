@@ -108,6 +108,37 @@ Copiez `.env.example` en `.env` pour changer le modèle, l'adresse d'Ollama, la 
 plafond de crédit. Avec `gemma4` (9,6 Go) sur un GPU de 8 Go, gardez `OLLAMA_NUM_CTX=8192` : la fenêtre
 par défaut (131 072 jetons) déborde de la mémoire vidéo et ralentit fortement le modèle.
 
+## Version web
+
+L'interface est publiée sur [Streamlit Cloud](https://agent-boreal.streamlit.app/) et sur
+[GitHub Pages](https://houssemeddinelassoued.github.io/agent-tri-courriels-boreal/). Le serveur de
+Streamlit n'a pas de GPU : il joint l'Ollama **de votre poste** par un tunnel [ngrok](https://ngrok.com)
+protégé par mot de passe. La version web ne répond donc que lorsque le poste, Ollama et le tunnel sont
+allumés ; les courriels transitent alors par ngrok et Streamlit Cloud.
+
+Mise en place (une seule fois) :
+
+1. Créez un compte ngrok gratuit, installez l'agent (`winget install ngrok.ngrok`), puis
+   `ngrok config add-authtoken <jeton>` ; notez votre domaine de développement
+   (*Universal Gateway → Domains*, du type `xxxx.ngrok-free.app`).
+2. Copiez `deploiement/ngrok-politique.exemple.yml` en `deploiement/ngrok-politique.yml`
+   (non versionné) et choisissez un mot de passe.
+3. Dans Streamlit Cloud (*Settings → Secrets*) :
+
+   ```toml
+   OLLAMA_BASE_URL = "https://boreal:MOT_DE_PASSE@xxxx.ngrok-free.app"
+   OLLAMA_MODEL = "gemma4"
+   OLLAMA_NUM_CTX = "8192"
+   ```
+
+À chaque séance, Ollama lancé :
+
+```bash
+ngrok http 11434 --url=https://xxxx.ngrok-free.app --host-header="localhost:11434" --traffic-policy-file=deploiement/ngrok-politique.yml
+```
+
+`--host-header` est indispensable : Ollama refuse (403) les requêtes adressées à un autre nom que `localhost`.
+
 ## Pour aller plus loin (module 9)
 
 Ce prototype n'est pas un système de production. Pour un pilote : connecteurs réels (Microsoft Graph,
