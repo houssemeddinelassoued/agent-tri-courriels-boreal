@@ -120,22 +120,24 @@ Mise en place (une seule fois) :
 
 1. Créez un compte ngrok gratuit, installez l'agent (`winget install ngrok.ngrok`), puis
    `ngrok config add-authtoken <jeton>` ; notez votre domaine de développement
-   (*Universal Gateway → Domains*, du type `xxxx.ngrok-free.app`).
+   (*Universal Gateway → Domains*, du type `xxxx.ngrok-free.dev`).
 2. Copiez `deploiement/ngrok-politique.exemple.yml` en `deploiement/ngrok-politique.yml`
    (non versionné) et choisissez un mot de passe.
 3. Dans Streamlit Cloud (*Settings → Secrets*) :
 
    ```toml
-   OLLAMA_BASE_URL = "https://boreal:MOT_DE_PASSE@xxxx.ngrok-free.app"
+   OLLAMA_BASE_URL = "https://boreal:MOT_DE_PASSE@xxxx.ngrok-free.dev"
    OLLAMA_MODEL = "gemma4"
    OLLAMA_NUM_CTX = "8192"
    ```
 
-À chaque séance, Ollama lancé :
+À chaque séance, Ollama lancé (gardez la fenêtre ouverte pendant la démo) :
 
-```bash
-ngrok http 11434 --url=https://xxxx.ngrok-free.app --host-header="localhost:11434" --traffic-policy-file=deploiement/ngrok-politique.yml
+```powershell
+.\deploiement	unnel-ollama.ps1
 ```
+
+Le script lance `ngrok http 11434 --url=https://<domaine> --host-header="localhost:11434" --traffic-policy-file=deploiement/ngrok-politique.yml`.
 
 `--host-header` est indispensable : Ollama refuse (403) les requêtes adressées à un autre nom que `localhost`.
 
