@@ -1,0 +1,66 @@
+[
+  {
+    "numero": "45812",
+    "client": "Julien Tremblay",
+    "produit": "table de patio en cèdre",
+    "total": 389.99,
+    "statut": "expediee",
+    "date_prevue": "jeudi 15 octobre",
+    "retard_jours": 3,
+    "lien_suivi": "https://suivi.boreal-distribution.example/45812"
+  },
+  {
+    "numero": "47230",
+    "client": "Sophie Bergeron",
+    "produit": "lot de 4 chaises de bistro",
+    "total": 249.5,
+    "statut": "livree",
+    "date_prevue": "2 octobre"
+  },
+  {
+    "numero": "48001",
+    "client": "Marc-André Pelletier",
+    "produit": "ensemble de salle à manger 7 pièces",
+    "total": 1849.0,
+    "statut": "expediee",
+    "date_prevue": "lundi 19 octobre",
+    "retard_jours": 6,
+    "lien_suivi": "https://suivi.boreal-distribution.example/48001"
+  },
+  {
+    "numero": "48213",
+    "client": "Nadia Côté",
+    "produit": "parasol déporté",
+    "total": 129.99,
+    "statut": "expediee",
+    "date_prevue": "vendredi 16 octobre",
+    "retard_jours": 3,
+    "lien_suivi": "https://suivi.boreal-distribution.example/48213"
+  },
+  {
+    "numero": "46550",
+    "client": "Luc Gagnon",
+    "produit": "réfrigérateur 18 pi³",
+    "total": 1299.0,
+    "statut": "expediee",
+    "date_prevue": "mardi 20 octobre",
+    "retard_jours": 4,
+    "lien_suivi": "https://suivi.boreal-distribution.example/46550"
+  },
+  {
+    "numero": "49120",
+    "client": "Émilie Roy",
+    "produit": "chaise de bureau ergonomique",
+    "total": 74.5,
+    "statut": "en_preparation",
+    "date_prevue": "mercredi 21 octobre"
+  },
+  {
+    "numero": "47805",
+    "client": "Karim Haddad",
+    "produit": "barbecue au propane",
+    "total": 560.0,
+    "statut": "livree",
+    "date_prevue": "28 septembre"
+  }
+]

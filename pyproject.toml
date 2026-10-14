@@ -1,0 +1,29 @@
+[project]
+name = "boreal-agent"
+version = "0.1.0"
+description = "Agent LangGraph de tri des courriels du service client (démo de la formation IA134)"
+readme = "README.md"
+authors = [
+    { name = "Houssem Eddine LASSOUED", email = "houssemeddine.lassoued@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "langchain-ollama>=1.1.0",
+    "langgraph>=1.2.15",
+    "pydantic>=2.14.1",
+    "python-dotenv>=1.2.4",
+    "streamlit>=1.65.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
