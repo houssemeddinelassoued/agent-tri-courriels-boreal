@@ -22,7 +22,7 @@ def configurer_page(titre: str, icone: str) -> bool:
             "LangGraph · Ollama · données fictives"
         )
         if st.button("Réinitialiser les systèmes Boréal", help="Vide les courriels envoyés, crédits et billets"):
-            for cle in ("systemes", "hitl_agent", "hitl", "evaluation"):
+            for cle in ("systemes", "hitl_agent", "hitl", "evaluation", "garde_fous"):
                 st.session_state.pop(cle, None)
             st.rerun()
     return ok

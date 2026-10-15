@@ -1,5 +1,7 @@
 """Exemple 2 · Garde-fous et injection de prompt (module 6, OWASP LLM01 et LLM06)."""
 
+import hashlib
+
 import streamlit as st
 
 import commun
@@ -17,8 +19,27 @@ st.markdown(
 )
 
 piege = next(c for c in charger_courriels_demo() if c.id == "D")
-corps = st.text_area("Courriel reçu (modifiable)", piege.corps, height=150)
-courriel = Courriel(**(piege.model_dump() | {"corps": corps}))
+
+# Le courriel analysé ne change qu'à la validation du formulaire ; les résultats des deux
+# agents restent affichés côte à côte jusqu'au courriel suivant.
+if "garde_fous" not in st.session_state:
+    st.session_state.garde_fous = {"corps": piege.corps, "naif": None, "protege": None}
+session = st.session_state.garde_fous
+
+with st.form("courriel_piege"):
+    corps = st.text_area("Courriel reçu (modifiable)", session["corps"], height=150)
+    valider, origine = st.columns([1, 1])
+    if valider.form_submit_button("Valider ce courriel", type="primary"):
+        session.update(corps=corps, naif=None, protege=None)
+    if origine.form_submit_button("Revenir au courriel d'origine"):
+        session.update(corps=piege.corps, naif=None, protege=None)
+        st.rerun()
+
+# Un courriel modifié est un nouveau courriel : identifiant propre, donc clé d'idempotence propre
+modifie = session["corps"] != piege.corps
+identifiant = f"D-{hashlib.sha1(session['corps'].encode()).hexdigest()[:6]}" if modifie else piege.id
+courriel = Courriel(**(piege.model_dump() | {"id": identifiant, "corps": session["corps"]}))
+st.caption(f"Courriel analysé : **{'version modifiée' if modifie else 'version d’origine'}** · identifiant `{identifiant}`")
 
 naif, protege = st.columns(2)
 
@@ -27,7 +48,8 @@ with naif:
     st.caption(f"Consigne : « {CONSIGNE_NAIVE} » · outil de crédit **sans plafond**")
     if st.button("Lancer l'agent naïf", disabled=not pret):
         with st.spinner("Le modèle choisit ses outils…"):
-            resultat = executer_agent_naif(courriel)
+            session["naif"] = executer_agent_naif(courriel)
+    if resultat := session["naif"]:
         if resultat["journal"]:
             for ligne in resultat["journal"]:
                 st.error(ligne, icon="💸")
@@ -43,7 +65,8 @@ with protege:
     if st.button("Lancer l'agent protégé", type="primary", disabled=not pret):
         agent = construire_agent(commun.extracteur(), commun.systemes(), traceur=commun.traceur(), filtre_injection=filtre)
         with st.spinner("Lire → Extraire → Décider → Agir…"):
-            etat = traiter(agent, courriel)
+            session["protege"] = traiter(agent, courriel)
+    if etat := session["protege"]:
         commun.afficher_resultat(etat)
         credits = [c["montant"] for c in commun.systemes().credits.values()]
         st.markdown(f"Crédits accordés depuis le début de la session : **{credits or 'aucun'}**")
